@@ -3,10 +3,12 @@
 
 typedef struct file_info {
     char *filename;
+    FILE *fp;
     int linenumber;
     int charlocation;
-    char *line;
 } FileInfo;
+
+FileInfo fileInfo;
 
 void display_fileinfo(FileInfo fi) {
     printf("\nLine no: %i\tChar no: %i\n", fi.linenumber, fi.charlocation);
@@ -18,20 +20,19 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    FileInfo fileInfo;
     fileInfo.filename = argv[1];
     fileInfo.linenumber = fileInfo.charlocation = 0;
 
-    FILE *fp = fopen(fileInfo.filename, "r");
-    if (fp==NULL) {
+    fileInfo.fp = fopen(fileInfo.filename, "r");
+    if (fileInfo.fp==NULL) {
         printf("Cannot open file!\n");
         return 2;
     }
 
     char c;
     for(;;) {
-        c = fgetc(fp);
-        if (feof(fp)) {
+        c = fgetc(fileInfo.fp);
+        if (feof(fileInfo.fp)) {
             break;
         }
 
@@ -46,6 +47,6 @@ int main(int argc, char *argv[]) {
         fileInfo.charlocation++;
     }
 
-    fclose(fp);
+    fclose(fileInfo.fp);
     return 0;
 }
