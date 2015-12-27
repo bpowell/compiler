@@ -14,6 +14,32 @@ void display_fileinfo(FileInfo fi) {
     printf("\nLine no: %i\tChar no: %i\n", fi.linenumber, fi.charlocation);
 }
 
+int lexan() {
+    int c;
+    for(;;) {
+        c = fgetc(fileInfo.fp);
+        if (feof(fileInfo.fp)) {
+            return -1;
+        }
+
+        fileInfo.charlocation++;
+
+        if (c==' ' || c=='\t') {
+            continue;
+        }
+
+        if (c=='\n') {
+            fileInfo.charlocation = 1;
+            fileInfo.linenumber++;
+            continue;
+        }
+
+        return c;
+    }
+
+    return -1;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("Needs args!");
@@ -29,22 +55,14 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
-    char c;
+    int c = lexan();
     for(;;) {
-        c = fgetc(fileInfo.fp);
-        if (feof(fileInfo.fp)) {
+        if (c==-1) {
             break;
         }
 
-        display_fileinfo(fileInfo);
         printf("%c", c);
-
-        if (c=='\n') {
-            fileInfo.charlocation = 0;
-            fileInfo.linenumber++;
-        }
-
-        fileInfo.charlocation++;
+        c = lexan();
     }
 
     fclose(fileInfo.fp);
