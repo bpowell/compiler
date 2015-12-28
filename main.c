@@ -9,6 +9,7 @@ typedef struct file_info {
 } FileInfo;
 
 FileInfo fileInfo;
+int lookahead;
 
 void display_fileinfo(FileInfo fi) {
     printf("\nLine no: %i\tChar no: %i\n", fi.linenumber, fi.charlocation);
@@ -31,6 +32,7 @@ int lexan() {
         if (c=='\n') {
             fileInfo.charlocation = 1;
             fileInfo.linenumber++;
+            printf("\n");
             continue;
         }
 
@@ -38,6 +40,75 @@ int lexan() {
     }
 
     return -1;
+}
+
+void error(const char *msg) {
+    printf("%s\n", msg);
+    exit(1);
+}
+
+void emit(int t) {
+    printf("%c ", t);
+}
+
+void match(int t) {
+    if (lookahead==t) {
+        lookahead = lexan();
+    } else {
+        //printf("lookahead = %c\tt = %c\n", lookahead, t);
+        error("syntax error");
+    }
+}
+
+void term() {
+    for(;;) {
+        switch(lookahead) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                emit(lookahead);
+                match(lookahead);
+            default:
+                return;
+        }
+    }
+}
+
+void expr() {
+    int t;
+    term();
+    for(;;) {
+        switch(lookahead) {
+            case '+':
+            case '-':
+                t = lookahead;
+                match(lookahead);
+                term();
+                emit(t);
+                continue;
+            default:
+                return;
+        }
+    }
+}
+
+void parse() {
+    lookahead = lexan();
+    for(;;) {
+        if (lookahead==-1) {
+            break;
+        }
+
+        expr();
+        match(';');
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -55,15 +126,7 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
-    int c = lexan();
-    for(;;) {
-        if (c==-1) {
-            break;
-        }
-
-        printf("%c", c);
-        c = lexan();
-    }
+    parse();
 
     fclose(fileInfo.fp);
     return 0;
