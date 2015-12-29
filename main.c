@@ -11,8 +11,8 @@ typedef struct file_info {
 FileInfo fileInfo;
 int lookahead;
 
-void display_fileinfo(FileInfo fi) {
-    printf("\nLine no: %i\tChar no: %i\n", fi.linenumber, fi.charlocation);
+void display_fileinfo() {
+    printf("\nLine no: %i\tChar no: %i\n", fileInfo.linenumber, fileInfo.charlocation);
 }
 
 int lexan() {
@@ -44,6 +44,7 @@ int lexan() {
 
 void error(const char *msg) {
     printf("%s\n", msg);
+    display_fileinfo();
     exit(1);
 }
 
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
     }
 
     fileInfo.filename = argv[1];
-    fileInfo.linenumber = fileInfo.charlocation = 0;
+    fileInfo.linenumber = fileInfo.charlocation = 1;
 
     fileInfo.fp = fopen(fileInfo.filename, "r");
     if (fileInfo.fp==NULL) {
