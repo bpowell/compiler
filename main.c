@@ -76,8 +76,9 @@ void term() {
             case '9':
                 emit(lookahead);
                 match(lookahead);
-            default:
                 return;
+            default:
+                error("syntax error2:");
         }
     }
 }
