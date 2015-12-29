@@ -42,10 +42,32 @@ int lexan() {
     return -1;
 }
 
+void gotonextline() {
+    int c;
+    for(;;) {
+        c = fgetc(fileInfo.fp);
+        if (feof(fileInfo.fp)) {
+            exit(2);
+        }
+
+        fileInfo.charlocation++;
+
+        if (c==' ' || c=='\t') {
+            continue;
+        }
+
+        if (c=='\n') {
+            fileInfo.charlocation = 1;
+            fileInfo.linenumber++;
+            return;
+        }
+    }
+}
+
 void error(const char *msg) {
     printf("%s\n", msg);
     display_fileinfo();
-    exit(1);
+    gotonextline();
 }
 
 void emit(int t) {
