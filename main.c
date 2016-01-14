@@ -47,7 +47,8 @@ void gotonextline() {
     for(;;) {
         c = fgetc(fileInfo.fp);
         if (feof(fileInfo.fp)) {
-            exit(2);
+            lookahead = -1;
+            return;
         }
 
         fileInfo.charlocation++;
@@ -65,6 +66,11 @@ void gotonextline() {
 }
 
 void error(const char *msg) {
+    if (lookahead==-1) {
+        printf("done...\n");
+        exit(2);
+    }
+
     printf("%s\n", msg);
     display_fileinfo();
     gotonextline();
