@@ -32,6 +32,11 @@ func (s *SrcFile) nextByte() (byte, error) {
 	return ch[0], nil
 }
 
+func (s *SrcFile) rewind() error {
+	_, err := s.File.Seek(1, 1)
+	return err
+}
+
 func (s *SrcFile) nextToken() (string, error) {
 	var token []byte
 	for {
