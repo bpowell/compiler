@@ -32,6 +32,26 @@ func (s *SrcFile) nextByte() (byte, error) {
 	return ch[0], nil
 }
 
+func (s *SrcFile) nextToken() (string, error) {
+	var token []byte
+	for {
+		ch, err := s.nextByte()
+		if err == io.EOF {
+			return string(token), err
+		}
+
+		switch ch {
+		case '\n',
+			' ':
+			return string(token), nil
+		}
+
+		token = append(token, ch)
+	}
+
+	return string(token), nil
+}
+
 func (s *SrcFile) printStat() {
 	fmt.Printf("Line number: %d\tChar number: %d\n", s.Lineno, s.Charno)
 }
@@ -44,13 +64,13 @@ func main() {
 
 	src1 := SrcFile{File: file, Lineno: 1}
 	for {
-		ch, err := src1.nextByte()
-		if err == io.EOF {
-			fmt.Println("Done!")
+		token, err := src1.nextToken()
+		if err != nil {
+			fmt.Println(err)
 			break
 		}
 
-		fmt.Printf("%d %s\n", ch, string(ch))
+		fmt.Println(token)
 		src1.printStat()
 	}
 }
