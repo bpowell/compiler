@@ -65,7 +65,59 @@ func (l *lexer) run() {
 	}
 }
 
+func isNumeric(ch rune) bool {
+	return (ch >= '0' && ch <= '9')
+}
+
+func isSpace(ch rune) bool {
+	return ch == ' ' || ch == '\t' || ch == '\n'
+}
+
+func decimalState(l *lexer) stateFn {
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_DECIMAL)
+		return nil
+	case isNumeric(ch):
+		l.next()
+		return decimalState
+	case isSpace(ch):
+		l.emit(TOK_DECIMAL)
+		l.next()
+		return startState
+	}
+
+	return nil
+}
+
+func numericState(l *lexer) stateFn {
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_NUMBER)
+		return nil
+	case ch == '.':
+		l.next()
+		return decimalState
+	case isNumeric(ch):
+		l.next()
+		return numericState
+	case isSpace(ch):
+		l.emit(TOK_NUMBER)
+		l.next()
+		return startState
+	}
+
+	return nil
+}
+
 func startState(l *lexer) stateFn {
 	fmt.Println("startState")
+	switch ch := l.next(); {
+	case ch == eof:
+		return nil
+	case isNumeric(ch):
+		return numericState
+	}
+
 	return nil
 }
