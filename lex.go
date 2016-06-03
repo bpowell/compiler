@@ -74,16 +74,16 @@ func isSpace(ch rune) bool {
 }
 
 func decimalState(l *lexer) stateFn {
+	defer l.next()
+
 	switch ch := l.peek(); {
 	case ch == eof:
 		l.emit(TOK_DECIMAL)
 		return nil
 	case isNumeric(ch):
-		l.next()
 		return decimalState
 	case isSpace(ch):
 		l.emit(TOK_DECIMAL)
-		l.next()
 		return startState
 	}
 
@@ -91,19 +91,18 @@ func decimalState(l *lexer) stateFn {
 }
 
 func numericState(l *lexer) stateFn {
+	defer l.next()
+
 	switch ch := l.peek(); {
 	case ch == eof:
 		l.emit(TOK_NUMBER)
 		return nil
 	case ch == '.':
-		l.next()
 		return decimalState
 	case isNumeric(ch):
-		l.next()
 		return numericState
 	case isSpace(ch):
 		l.emit(TOK_NUMBER)
-		l.next()
 		return startState
 	}
 
