@@ -73,6 +73,14 @@ func isSpace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n'
 }
 
+func isAlpha(ch rune) bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+}
+
+func isAlphaNumeric(ch rune) bool {
+	return isAlpha(ch) || isNumeric(ch)
+}
+
 func decimalState(l *lexer) stateFn {
 	defer l.next()
 
