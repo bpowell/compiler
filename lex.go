@@ -55,6 +55,10 @@ func (l *lexer) rewind() {
 
 // emit a token to the lexer
 func (l *lexer) emit(t int) {
+	if l.input[l.start] == ' ' {
+		l.start += 1
+	}
+
 	l.tokens = append(l.tokens, Token{t, l.input[l.start:l.pos]})
 	l.start = l.pos
 }
