@@ -81,6 +81,16 @@ func isAlphaNumeric(ch rune) bool {
 	return isAlpha(ch) || isNumeric(ch)
 }
 
+func (l *lexer) eat() {
+	for {
+		if !isAlphaNumeric(l.peek()) {
+			break
+		}
+
+		l.next()
+	}
+}
+
 func decimalState(l *lexer) stateFn {
 	defer l.next()
 
