@@ -91,6 +91,14 @@ func (l *lexer) eat() {
 	}
 }
 
+func errorState(l *lexer) stateFn {
+	l.eat()
+	fmt.Printf("Invalid token %s at position %d\n", l.input[l.start:l.pos], l.start)
+	l.start = l.pos
+
+	return startState
+}
+
 func decimalState(l *lexer) stateFn {
 	defer l.next()
 
@@ -103,6 +111,8 @@ func decimalState(l *lexer) stateFn {
 	case isSpace(ch):
 		l.emit(TOK_DECIMAL)
 		return startState
+	default:
+		return errorState
 	}
 
 	return nil
@@ -122,18 +132,23 @@ func numericState(l *lexer) stateFn {
 	case isSpace(ch):
 		l.emit(TOK_NUMBER)
 		return startState
+	default:
+		return errorState
 	}
 
 	return nil
 }
 
 func startState(l *lexer) stateFn {
-	fmt.Println("startState")
 	switch ch := l.next(); {
 	case ch == eof:
 		return nil
 	case isNumeric(ch):
 		return numericState
+	case isSpace(ch):
+		return startState
+	default:
+		return errorState
 	}
 
 	return nil
