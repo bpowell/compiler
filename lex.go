@@ -8,6 +8,7 @@ import (
 const (
 	TOK_NUMBER int = iota
 	TOK_DECIMAL
+	TOK_PLUS
 )
 
 const eof = -1
@@ -143,6 +144,23 @@ func numericState(l *lexer) stateFn {
 	return nil
 }
 
+func plusState(l *lexer) stateFn {
+	defer l.next()
+
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_PLUS)
+		return nil
+	case isNumeric(ch) || isSpace(ch):
+		l.emit(TOK_PLUS)
+		return startState
+	default:
+		return errorState
+	}
+
+	return nil
+}
+
 func startState(l *lexer) stateFn {
 	switch ch := l.next(); {
 	case ch == eof:
@@ -151,6 +169,8 @@ func startState(l *lexer) stateFn {
 		return numericState
 	case isSpace(ch):
 		return startState
+	case ch == '+':
+		return plusState
 	default:
 		return errorState
 	}
