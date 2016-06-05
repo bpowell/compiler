@@ -86,6 +86,15 @@ func isAlphaNumeric(ch rune) bool {
 	return isAlpha(ch) || isNumeric(ch)
 }
 
+func isOperator(ch rune) bool {
+	switch ch {
+	case '+':
+		return true
+	}
+
+	return false
+}
+
 func (l *lexer) eat() {
 	for {
 		if !isAlphaNumeric(l.peek()) {
@@ -116,6 +125,10 @@ func decimalState(l *lexer) stateFn {
 	case isSpace(ch):
 		l.emit(TOK_DECIMAL)
 		return startState
+	case isOperator(ch):
+		l.emit(TOK_DECIMAL)
+		l.rewind()
+		return startState
 	default:
 		return errorState
 	}
@@ -136,6 +149,10 @@ func numericState(l *lexer) stateFn {
 		return numericState
 	case isSpace(ch):
 		l.emit(TOK_NUMBER)
+		return startState
+	case isOperator(ch):
+		l.emit(TOK_NUMBER)
+		l.rewind()
 		return startState
 	default:
 		return errorState
