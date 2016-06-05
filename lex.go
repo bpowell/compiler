@@ -9,6 +9,7 @@ const (
 	TOK_NUMBER int = iota
 	TOK_DECIMAL
 	TOK_PLUS
+	TOK_MINUS
 )
 
 const eof = -1
@@ -88,7 +89,7 @@ func isAlphaNumeric(ch rune) bool {
 
 func isOperator(ch rune) bool {
 	switch ch {
-	case '+':
+	case '+', '-':
 		return true
 	}
 
@@ -178,6 +179,23 @@ func plusState(l *lexer) stateFn {
 	return nil
 }
 
+func minusState(l *lexer) stateFn {
+	defer l.next()
+
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_MINUS)
+		return nil
+	case isNumeric(ch) || isSpace(ch):
+		l.emit(TOK_MINUS)
+		return startState
+	default:
+		return errorState
+	}
+
+	return nil
+}
+
 func startState(l *lexer) stateFn {
 	switch ch := l.next(); {
 	case ch == eof:
@@ -188,6 +206,8 @@ func startState(l *lexer) stateFn {
 		return startState
 	case ch == '+':
 		return plusState
+	case ch == '-':
+		return minusState
 	default:
 		return errorState
 	}
