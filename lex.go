@@ -10,6 +10,8 @@ const (
 	TOK_DECIMAL
 	TOK_PLUS
 	TOK_MINUS
+	TOK_MULTIPLY
+	TOK_DIVIDE
 )
 
 const eof = -1
@@ -89,7 +91,7 @@ func isAlphaNumeric(ch rune) bool {
 
 func isOperator(ch rune) bool {
 	switch ch {
-	case '+', '-':
+	case '+', '-', '*', '/':
 		return true
 	}
 
@@ -196,6 +198,40 @@ func minusState(l *lexer) stateFn {
 	return nil
 }
 
+func multiplyState(l *lexer) stateFn {
+	defer l.next()
+
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_MULTIPLY)
+		return nil
+	case isNumeric(ch) || isSpace(ch):
+		l.emit(TOK_MULTIPLY)
+		return startState
+	default:
+		return errorState
+	}
+
+	return nil
+}
+
+func divideState(l *lexer) stateFn {
+	defer l.next()
+
+	switch ch := l.peek(); {
+	case ch == eof:
+		l.emit(TOK_DIVIDE)
+		return nil
+	case isNumeric(ch) || isSpace(ch):
+		l.emit(TOK_DIVIDE)
+		return startState
+	default:
+		return errorState
+	}
+
+	return nil
+}
+
 func startState(l *lexer) stateFn {
 	switch ch := l.next(); {
 	case ch == eof:
@@ -208,6 +244,10 @@ func startState(l *lexer) stateFn {
 		return plusState
 	case ch == '-':
 		return minusState
+	case ch == '*':
+		return multiplyState
+	case ch == '/':
+		return divideState
 	default:
 		return errorState
 	}
